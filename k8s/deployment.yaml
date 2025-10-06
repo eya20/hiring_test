@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hiring-test-api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: hiring-test-api
+  template:
+    metadata:
+      labels:
+        app: hiring-test-api
+    spec:
+      containers:
+      - name: api
+        image: hiring-test-api:latest
+        ports:
+        - containerPort: 8484
+        env:
+        - name: POSTGRES_HOST
+          value: "postgres-service"
