@@ -34,13 +34,23 @@ func main() {
 	)
 	defer close()
 
-	// Initialize handlers
+	// Initialize repositories
 	prodRepo := models.NewProductsRepository(db)
-	cat := catalog.NewCatalogHandler(prodRepo)
+	categoriesRepo := models.NewCategoriesRepository(db)
+
+	// Initialize services
+	catalogService := catalog.NewCatalogService(prodRepo)
+
+	// Initialize handlers
+	catalogHandler := catalog.NewCatalogHandler(catalogService)
+	categoriesHandler := catalog.NewCategoriesHandler(categoriesRepo)
 
 	// Set up routing
 	mux := http.NewServeMux()
-	mux.HandleFunc("GET /catalog", cat.HandleGet)
+	mux.HandleFunc("GET /catalog", catalogHandler.GetCatalog)
+	mux.HandleFunc("GET /catalog/{code}", catalogHandler.GetProductDetails)
+	mux.HandleFunc("GET /categories", categoriesHandler.GetCategories)
+	mux.HandleFunc("POST /categories", categoriesHandler.CreateCategory)
 
 	// Set up the HTTP server
 	srv := &http.Server{
